@@ -1,0 +1,15 @@
+{
+  "name": "dynamodb_ejem1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Michel Maes",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.618.0",
+    "express": "^4.17.1"
+  }
+}
