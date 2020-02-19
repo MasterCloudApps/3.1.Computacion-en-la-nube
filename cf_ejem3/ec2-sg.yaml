@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Resources: 
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: codenaeva-aws-elastest
+      ImageId: ami-035966e8adab4aaad
+      InstanceType: "t2.micro"
+      SecurityGroups:
+        - !Ref mySecurityGroup
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        apt-get update && apt-get install -y nginx
+      Tags:
+        - Key: Name
+          Value: cf-sample-1
+  mySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: nginx-80-443
+      GroupDescription: "SG for Nginx with egress ports 80 & 443"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  WebSiteURL:
+    Value:
+      !Join
+        - ''
+        - - "http://"
+          - !GetAtt myEC2Instance.PublicDnsName
+    Description: "Nginx website"
