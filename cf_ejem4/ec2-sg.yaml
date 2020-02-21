@@ -41,5 +41,6 @@ Outputs:
         - ''
         - - "http://"
           - !GetAtt myEC2Instance.PublicDnsName
+          - ":8080"
           - "/api/post/"
-    Description: "Nginx website"
+    Description: "Ejemplo 1 CQRS - Blog"
