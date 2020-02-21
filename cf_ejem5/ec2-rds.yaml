@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Parameters:
+  DBPassword:
+    Description: Database password
+    Type: String
+    NoEcho: true
+
+Resources: 
+  rdsDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: "db.t2.micro"
+      AllocatedStorage: 10
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      DBInstanceIdentifier: springaws
+      DBName: springaws
+      Engine: mysql
+      EngineVersion: 5.7
+      MasterUsername: springaws
+      MasterUserPassword: !Ref DBPassword
+      MultiAZ: false
+      PubliclyAccessible: true
+      StorageEncrypted: false
+      VPCSecurityGroups:
+        - !GetAtt rdsSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: cf-sample-4-rds
+  rdsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "SG for MySQL RDS"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '3306'
+          ToPort: '3306'
+          SourceSecurityGroupName: !Ref ec2SecurityGroup # Sólo permite acceso a las instancias de este grupo
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn: rdsDBInstance
+    Properties:
+      KeyName: codenaeva-aws-elastest
+      ImageId: ami-035966e8adab4aaad
+      InstanceType: "t2.micro"
+      IamInstanceProfile: rds-s3-fullaccess
+      Monitoring: true
+      SecurityGroups:
+        - !Ref ec2SecurityGroup
+      UserData: 
+        Fn::Base64: 
+          Fn::Sub: 
+            - |
+              #!/bin/bash -ex
+              apt-get update && apt-get install -y openjdk-8-jre-headless
+              wget https://github.com/codeurjc/spring-cloud-aws-sample/releases/download/0.1.0/spring-cloud-aws-sample-0.1.0-SNAPSHOT.jar
+              java -jar spring-cloud-aws-sample-0.1.0-SNAPSHOT.jar --cloud.aws.rds.springaws.password=${Pass}
+            - Pass: !Ref DBPassword
+      Tags:
+        - Key: Name
+          Value: cf-sample-5
+  ec2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: spring-8080-8443
+      GroupDescription: "SG for Nginx with egress ports 80 & 443"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8443'
+          ToPort: '8443'
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  WebSiteURL:
+    Value:
+      !Join
+        - ''
+        - - "http://"
+          - !GetAtt myEC2Instance.PublicDnsName
+          - ":8080/"
+    Description: "Web de anuncios"
