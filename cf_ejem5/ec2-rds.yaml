@@ -6,6 +6,13 @@ Parameters:
     Description: Database password
     Type: String
     NoEcho: true
+    MinLength: 8
+  KeyName:
+    Description: Key pair to use in EC2 instance
+    Type: AWS::EC2::KeyPair::KeyName
+  EC2InstanceRole:
+    Description: EC2 instance role
+    Type: String
 
 Resources: 
   rdsDBInstance:
@@ -42,7 +49,7 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: rdsDBInstance
     Properties:
-      KeyName: codenaeva-aws-elastest
+      KeyName: !Ref KeyName
       ImageId: ami-035966e8adab4aaad
       InstanceType: "t2.micro"
       IamInstanceProfile: rds-s3-fullaccess
