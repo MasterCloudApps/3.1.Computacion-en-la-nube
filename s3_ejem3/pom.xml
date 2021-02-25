@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>es.urjc.code</groupId>
-	<artifactId>s3_ejer1</artifactId>
+	<artifactId>s3_ejem3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>demo</name>
 	<description>Demo project for Spring Boot</description>
