@@ -97,7 +97,7 @@ public class Main {
         FileUtils.copyInputStreamToFile(inputStream, new File("files/privateDataFromS3.txt"));
 
         // Esperamos a que el usuario pueda comprobar los cambios en el navegador
-        System.out.println("Open: https://"+bucketName+".s3.amazonaws.com/"+publicObjectName+" in browser");
+        System.out.println("Open: https://s3.amazonaws.com/"+bucketName+"/"+publicObjectName+" in browser");
 
         waitUser();
 
