@@ -1,23 +1,14 @@
-# our base image
-FROM alpine:3.5
+FROM node:lts-buster
 
-# Install python and pip
-RUN apk add --update py2-pip
+WORKDIR /usr/src/app/
 
-# upgrade pip
-RUN pip install --upgrade pip
+COPY package.json /usr/src/app/
 
-# install Python modules needed by the Python app
-# copy files required for the app to run
-COPY requirements.txt /usr/src/app/
+RUN npm install
 
-RUN pip install --no-cache-dir -r /usr/src/app/requirements.txt
+COPY server.js /usr/src/app/
+COPY views/index.html /usr/src/app/views/
 
-COPY app.py /usr/src/app/
-COPY templates/index.html /usr/src/app/templates/
-
-# tell the port number the container should expose
 EXPOSE 5000
 
-# run the application
-CMD ["python", "/usr/src/app/app.py"]
+CMD ["npm", "start"]

@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "maes95/webgatos",
+    "Name": "maes95/webgatos:cloud-2021",
     "Update": "true"
   },
   "Ports": [
