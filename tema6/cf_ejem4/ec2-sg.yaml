@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Resources: 
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: "mca-cf"
+      ImageId: "ami-08a7e27b95390cc06"
+      InstanceType: "t3.micro"
+      Monitoring: true
+      SecurityGroups:
+        - !Ref mySecurityGroup
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        apt update && apt install -y openjdk-14-jre-headless
+        wget https://github.com/MasterCloudApps/2.4.Patrones-y-arquitecturas-de-servicios-de-Internet/releases/download/0.1.0/blog-cqrs-ejem1-1.0.0.jar
+        java -jar blog-cqrs-ejem1-1.0.0.jar
+      Tags:
+        - Key: Name
+          Value: cf-sample-4
+  mySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: spring-8080-8443
+      GroupDescription: "SG for Nginx with egress ports 80 & 443"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8443'
+          ToPort: '8443'
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  WebSiteURL:
+    Value:
+      !Join
+        - ''
+        - - "http://"
+          - !GetAtt myEC2Instance.PublicDnsName
+          - ":8080"
+          - "/api/post/"
+    Description: "Ejemplo 1 CQRS - Blog"

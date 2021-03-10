@@ -1,0 +1,9 @@
+Resources:
+  MasterCloudAppsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: mca-cf-1-bucket
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html

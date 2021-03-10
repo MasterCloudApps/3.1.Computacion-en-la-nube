@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Parameters:
+  SecurityGroupId:
+    Description: Security group id for EC2 instance
+    Type: String
+
+Resources: 
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: "mca-cf"
+      ImageId: "ami-08a7e27b95390cc06"
+      InstanceType: "t3.micro"
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        apt update && apt install -y nginx
+      Tags:
+        - Key: Name
+          Value: mca-cf-sample-1
+
+Outputs:
+  WebSiteURL:
+    Value:
+      !Join
+        - ''
+        - - "http://"
+          - !GetAtt myEC2Instance.PublicDnsName
+    Description: "Nginx website"

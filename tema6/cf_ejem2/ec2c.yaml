@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Parameters:
+  SecurityGroupId:
+    Description: Security group id for EC2 instance
+    Type: 'AWS::EC2::SecurityGroup::Id'
+  KeyName:
+    Description: The key name
+    Type:  'AWS::EC2::KeyPair::KeyName'
+  AMIId:
+    Description: The ami to use (it must be an AMI on the current region and must be Ubuntu 20.04)
+    Type: 'AWS::EC2::Image::Id'
+
+Resources: 
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref KeyName
+      ImageId: !Ref AMIId
+      InstanceType: "t3.micro"
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        apt update && apt install -y nginx
+      Tags:
+        - Key: Name
+          Value: mca-cf-sample-1
+
+Outputs:
+  WebSiteURL:
+    Value:
+      !Join
+        - ''
+        - - "http://"
+          - !GetAtt myEC2Instance.PublicDnsName
+    Description: "Nginx website"
