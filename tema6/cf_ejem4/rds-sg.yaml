@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Parameters:
+  DBInstanceId:
+    Description: Db Instance Identifier
+    Type: String
+    Default: springaws
+  DBPassword:
+    Description: Database password
+    Type: String
+    NoEcho: true
+    MinLength: 8
+  DBInstanceClass:
+    Description: Instance type for db
+    Type: String
+    Default: db.t2.micro
+
+Resources:
+  ec2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: spring-8080-8443
+      GroupDescription: "SG for Java web app with ingress ports 8080 & 8443"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8443'
+          ToPort: '8443'
+          CidrIp: 0.0.0.0/0
+
+  rdsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "SG for MySQL RDS"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '3306'
+          ToPort: '3306'
+          SourceSecurityGroupName: !Ref ec2SecurityGroup # Sólo permite acceso a las instancias de este grupo
+
+  rdsDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: 10
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      DBInstanceIdentifier: !Ref DBInstanceId
+      DBName: springaws
+      Engine: mysql
+      EngineVersion: 8.0
+      MasterUsername: springaws
+      MasterUserPassword: !Ref DBPassword
+      MultiAZ: false
+      PubliclyAccessible: true
+      StorageEncrypted: false
+      VPCSecurityGroups:
+        - !GetAtt rdsSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: mca-cf-sample-5-rds
