@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @RestController
 @RequestMapping("/buckets")
@@ -26,12 +26,12 @@ public class BucketsController {
 	S3Service s3service;
 
 	@GetMapping("/")
-	public List<Bucket> getBuckets() {
+	public List<MyBucket> getBuckets() {
 		return s3service.getAllBuckets();
 	}
 
 	@GetMapping("/{bucketName}/objects")
-	public List<S3ObjectSummary> getBucket(@PathVariable String bucketName) {
+	public List<MyS3Object> getBucket(@PathVariable String bucketName) {
 		return s3service.getBucketObjects(bucketName);
 	}
 
