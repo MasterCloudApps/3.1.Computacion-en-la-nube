@@ -1,5 +1,8 @@
-const mustacheExpress = require('mustache-express');
-const express = require('express');
+import mustacheExpress from 'mustache-express';
+import express from 'express';
+import path from 'path';
+
+const __dirname = path.resolve();
 const port = 5000;
 
 let app = express()
@@ -20,7 +23,7 @@ app.engine('html', mustacheExpress());
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     let image = images[Math.floor(Math.random() * images.length)];
     res.render('index', { url: image });
 });
