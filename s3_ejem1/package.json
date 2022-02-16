@@ -1,14 +1,15 @@
 {
-  "name": "s3_ejem1",
-  "version": "1.0.0",
-  "description": "",
-  "main": "s3_show_bucket.js",
-  "scripts": {
-    "start": "node s3_show_bucket.js"
-  },
-  "author": "Michel Maes",
-  "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "^2.618.0"
-  }
+    "name": "s3_ejem1",
+    "version": "1.0.0",
+    "description": "",
+    "main": "s3_show_bucket.js",
+    "scripts": {
+        "start": "node s3_show_bucket.js"
+    },
+    "type": "module",
+    "author": "Michel Maes",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "2.1074.0"
+    }
 }
