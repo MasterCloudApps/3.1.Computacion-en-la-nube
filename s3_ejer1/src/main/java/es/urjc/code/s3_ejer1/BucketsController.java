@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-
 @RestController
 @RequestMapping("/buckets")
 public class BucketsController {
@@ -26,12 +23,12 @@ public class BucketsController {
 	S3Service s3service;
 
 	@GetMapping("/")
-	public List<Bucket> getBuckets() {
+	public List<MyBucket> getBuckets() {
 		return s3service.getAllBuckets();
 	}
 
 	@GetMapping("/{bucketName}/objects")
-	public List<S3ObjectSummary> getBucket(@PathVariable String bucketName) {
+	public List<MyS3Object> getBucket(@PathVariable String bucketName) {
 		return s3service.getBucketObjects(bucketName);
 	}
 
@@ -39,6 +36,13 @@ public class BucketsController {
 	public ResponseEntity<String> createBucket(@PathVariable String bucketName) {
 		s3service.createBucket(bucketName);
 		return new ResponseEntity<>("Bucket created!", HttpStatus.CREATED);
+	}
+
+	@PostMapping("/{bucketName}/uploadObject")
+	public ResponseEntity<String> uploadFile(@PathVariable String bucketName, @RequestParam("file") MultipartFile file, @RequestParam boolean isPublic)
+			throws IllegalStateException, IOException {
+        s3service.uploadFile(bucketName, file, isPublic);
+		return new ResponseEntity<>("Object "+file.getOriginalFilename()+" created in bucket "+bucketName, HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping("/{bucketName}/{objectName}")
@@ -53,15 +57,6 @@ public class BucketsController {
 		return new ResponseEntity<>("Bucket deleted!", HttpStatus.OK);
 	}
 
-	// SOLUTION
-
-	@PostMapping("/{bucketName}/uploadObject")
-	public ResponseEntity<String> uploadFile(@PathVariable String bucketName, @RequestParam("file") MultipartFile file, @RequestParam boolean isPublic)
-			throws IllegalStateException, IOException {
-        s3service.uploadFile(bucketName, file, isPublic);
-		return new ResponseEntity<>("Object "+file.getOriginalFilename()+" created in bucket "+bucketName, HttpStatus.CREATED);
-	}
-
 	@PostMapping("/{bucketName}/{objectName}/copy")
 	public ResponseEntity<String> copyObject(
 			@PathVariable String bucketName,
@@ -71,7 +66,5 @@ public class BucketsController {
         s3service.copyObject(bucketName, objectName, destinationBucketName, objectName);
 		return new ResponseEntity<>("Object "+objectName+" copied from "+bucketName+" to "+destinationBucketName, HttpStatus.OK);
 	}
-
-
 
 }
