@@ -5,12 +5,12 @@ var app = express();
 app.use(express.json()) 
 
 AWS.config.update({
-  region: "us-east-1", // North virginia - USA
+  region: "eu-west-1", // Ireland - Europe
 });
 
 var index = 0;
 
-const table ="anuncios"
+const table ="anuncio"
 
 var db = new AWS.DynamoDB.DocumentClient();
 
