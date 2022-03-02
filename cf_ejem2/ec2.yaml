@@ -1,18 +1,23 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: EC2
 
+Parameters: 
+  KeyName:
+    Description: Key pair to use in EC2 instance
+    Type: AWS::EC2::KeyPair::KeyName
+
 Resources: 
   myEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: codenaeva-aws-elastest
-      ImageId: ami-035966e8adab4aaad
+      KeyName: !Ref KeyName
+      ImageId:  ami-08ca3fed11864d6bb
       InstanceType: "t2.micro"
       SecurityGroupIds:
-        - sg-0ddd30794dedc1ba3
+        - sg-05ffda682903ac61b
       UserData: !Base64 |
         #!/bin/bash -ex
-        apt-get update && apt-get install -y nginx
+        apt update && apt install -y nginx
       Tags:
         - Key: Name
           Value: cf-sample-1

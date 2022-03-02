@@ -1,26 +1,17 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: EC2
 
+Parameters: 
+  KeyName:
+    Description: Key pair to use in EC2 instance
+    Type: AWS::EC2::KeyPair::KeyName
+
 Resources: 
-  myEC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      KeyName: codenaeva-aws-elastest
-      ImageId: ami-035966e8adab4aaad
-      InstanceType: "t2.micro"
-      SecurityGroups:
-        - !Ref mySecurityGroup
-      UserData: !Base64 |
-        #!/bin/bash -ex
-        apt-get update && apt-get install -y nginx
-      Tags:
-        - Key: Name
-          Value: cf-sample-1
   mySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: nginx-80-443
-      GroupDescription: "SG for Nginx with egress ports 80 & 443"
+      GroupName: mca-nginx-80-443
+      GroupDescription: "SG for Nginx with ingress ports 80 & 443"
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '80'
@@ -30,6 +21,20 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref KeyName
+      ImageId: ami-08ca3fed11864d6bb
+      InstanceType: "t2.micro"
+      SecurityGroups:
+        - !Ref mySecurityGroup
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        apt-get update && apt-get install -y nginx
+      Tags:
+        - Key: Name
+          Value: cf-sample-1
 
 Outputs:
   WebSiteURL:
