@@ -50,9 +50,9 @@ Resources:
     DependsOn: rdsDBInstance
     Properties:
       KeyName: !Ref KeyName
-      ImageId: ami-035966e8adab4aaad
+      ImageId: ami-08ca3fed11864d6bb
       InstanceType: "t2.micro"
-      IamInstanceProfile: rds-s3-fullaccess
+      IamInstanceProfile: !Ref EC2InstanceRole
       Monitoring: true
       SecurityGroups:
         - !Ref ec2SecurityGroup

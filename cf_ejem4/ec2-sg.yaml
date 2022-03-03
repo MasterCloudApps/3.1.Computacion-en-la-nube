@@ -1,12 +1,17 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: EC2
 
+Parameters: 
+  KeyName:
+    Description: Key pair to use in EC2 instance
+    Type: AWS::EC2::KeyPair::KeyName
+
 Resources: 
   myEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: codenaeva-aws-elastest
-      ImageId: ami-035966e8adab4aaad
+      KeyName: !Ref KeyName
+      ImageId: ami-08ca3fed11864d6bb
       InstanceType: "t2.micro"
       Monitoring: true
       SecurityGroups:
@@ -14,7 +19,7 @@ Resources:
       UserData: !Base64 |
         #!/bin/bash -ex
         apt-get update && apt-get install -y openjdk-8-jre-headless
-        wget https://github.com/MasterCloudApps/2.4.Patrones-y-arquitecturas-de-servicios-de-Internet/releases/download/0.1.0/blog-cqrs-ejem1-1.0.0.jar
+        wget https://github.com/MasterCloudApps/2.2.Patrones-y-arquitecturas-de-servicios-web/releases/download/0.1.0/blog-cqrs-ejem1-1.0.0.jar
         java -jar blog-cqrs-ejem1-1.0.0.jar
       Tags:
         - Key: Name
