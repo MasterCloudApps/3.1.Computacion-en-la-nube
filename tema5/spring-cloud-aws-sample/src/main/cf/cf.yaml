@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2
+
+Parameters:
+  DBPassword:
+    Description: Database password
+    Type: String
+    NoEcho: true
+    MinLength: 8
+  KeyName:
+    Description: Key pair to use in EC2 instance
+    Type: AWS::EC2::KeyPair::KeyName
+  EC2InstanceRole:
+    Description: EC2 instance role
+    Type: String
+    Default: ec2-rds-s3-full-access
+
+Resources: 
+  rdsDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: "db.t2.micro"
+      AllocatedStorage: 10
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      DBInstanceIdentifier: springaws
+      DBName: springaws
+      Engine: mysql
+      EngineVersion: 5.7
+      MasterUsername: springaws
+      MasterUserPassword: !Ref DBPassword
+      MultiAZ: false
+      PubliclyAccessible: true
+      StorageEncrypted: false
+      VPCSecurityGroups:
+        - !GetAtt rdsSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: cf-tema5
+  rdsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "SG for MySQL RDS"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '3306'
+          ToPort: '3306'
+          SourceSecurityGroupName: !Ref ec2SecurityGroup # Sólo permite acceso a las instancias de este grupo
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn: rdsDBInstance
+    Properties:
+      KeyName: !Ref KeyName
+      ImageId: ami-08ca3fed11864d6bb
+      InstanceType: "t2.micro"
+      IamInstanceProfile: !Ref EC2InstanceRole
+      Monitoring: true
+      SecurityGroups:
+        - !Ref ec2SecurityGroup
+      UserData: !Base64 |
+              #!/bin/bash -ex
+              apt-get update && apt-get install -y openjdk-17-jre-headless
+              wget https://mca-s3-prueba3.s3.eu-west-1.amazonaws.com/spring-cloud-aws-sample-0.2.0-SNAPSHOT.jar
+              java -jar spring-cloud-aws-sample-0.2.0-SNAPSHOT.jar \
+                --cloud.aws.rds.instances[0].dbInstanceIdentifier=springaws \
+                --cloud.aws.rds.instances[0].password=${DBPassword}                                                                               
+      Tags:
+        - Key: Name
+          Value: cf-sample-5
+  ec2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: spring-8080-8443
+      GroupDescription: "SG for Nginx with egress ports 80 & 443"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8443'
+          ToPort: '8443'
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  WebSiteURL:
+    Value:
+      !Join
+        - ''
+        - - "http://"
+          - !GetAtt myEC2Instance.PublicDnsName
+          - ":8080/"
+    Description: "Web de anuncios"
