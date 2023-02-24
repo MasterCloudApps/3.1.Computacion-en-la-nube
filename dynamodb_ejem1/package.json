@@ -9,7 +9,7 @@
   "author": "Michel Maes",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.618.0",
+    "aws-sdk": "2.1304.0",
     "express": "^4.17.1"
   }
 }

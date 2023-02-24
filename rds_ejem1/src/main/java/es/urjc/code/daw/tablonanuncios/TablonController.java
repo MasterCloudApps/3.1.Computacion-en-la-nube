@@ -34,7 +34,7 @@ public class TablonController {
 	@GetMapping("/anuncio/{id}")
 	public String verAnuncio(Model model, @PathVariable long id) {
 		
-		Anuncio anuncio = repository.getById(id);
+		Anuncio anuncio = repository.findById(id).get();
 
 		model.addAttribute("anuncio", anuncio);
 

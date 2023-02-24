@@ -1,1 +1,1 @@
-CREATE SCHEMA anuncios;
+CREATE SCHEMA test;

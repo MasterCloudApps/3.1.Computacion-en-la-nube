@@ -10,6 +10,6 @@
     "author": "Michel Maes",
     "license": "ISC",
     "dependencies": {
-        "aws-sdk": "2.1074.0"
+        "aws-sdk": "2.1304.0"
     }
 }
