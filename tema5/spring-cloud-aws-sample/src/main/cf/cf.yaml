@@ -61,7 +61,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash -ex
           apt-get update && apt-get install -y openjdk-17-jre-headless
-          wget https://mca-s3-prueba3.s3.eu-west-1.amazonaws.com/spring-cloud-aws-sample-0.2.0-SNAPSHOT.jar
+          wget https://github.com/MasterCloudApps/3.1.Computacion-en-la-nube/raw/master/tema5/spring-cloud-aws-sample/spring-cloud-aws-sample-0.2.0-SNAPSHOT.jar
           java -jar spring-cloud-aws-sample-0.2.0-SNAPSHOT.jar \
             --cloud.aws.rds.instances[0].dbInstanceIdentifier=springaws \
             --cloud.aws.rds.instances[0].password=${DBPassword}                                                                               

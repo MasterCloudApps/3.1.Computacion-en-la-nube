@@ -1,5 +1,7 @@
 package es.urjc.code.daw.tablonanuncios;
 
+import java.net.URL;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Controller
 public class TablonController {
@@ -24,14 +28,17 @@ public class TablonController {
 	@Autowired
 	private AnunciosRepository repository;
 	
-	@Autowired
-	private AmazonS3 s3;
+	private S3Client s3;
+
+	private S3Utilities utilities;
 	
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
 	@PostConstruct
 	public void init() {
+		this.s3 = S3Client.builder().build(); 
+        this.utilities = s3.utilities();
 		repository.save(new Anuncio("Pepe", "Hola caracola", "A description"));
 		repository.save(new Anuncio("Juan", "Hola caracola", "A description"));
 	}
@@ -54,11 +61,15 @@ public class TablonController {
 
         if (!file.isEmpty()) {
             try {
-                ObjectMetadata objectMetadata = new ObjectMetadata();
-                objectMetadata.setContentType(file.getContentType());
 
-                TransferManager transferManager = TransferManagerBuilder.defaultTransferManager();
-                transferManager.upload(bucket, filename, file.getInputStream(), objectMetadata);
+				s3.putObject(
+					PutObjectRequest.builder()
+						.bucket(bucket)
+						.key(filename)
+						.acl(ObjectCannedACL.PUBLIC_READ)
+						.build(), 
+					RequestBody.fromBytes(file.getBytes())
+				);
                 
             } catch (Exception e) {
             	model.addAttribute("message", "You failed to upload " + filename + " => " + e.getMessage());
@@ -70,7 +81,15 @@ public class TablonController {
         }
 
         Anuncio anuncio = new Anuncio(nombre, asunto, comentario);
-        anuncio.setFoto(s3.getUrl(bucket, filename));
+
+		URL url = utilities.getUrl(
+            GetUrlRequest.builder()
+                .bucket(bucket)
+                .key(filename)
+                .build()
+        );
+
+        anuncio.setFoto(url);
 
 		repository.save(anuncio);
 
