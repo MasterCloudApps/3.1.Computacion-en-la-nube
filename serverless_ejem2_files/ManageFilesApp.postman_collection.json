@@ -1,0 +1,50 @@
+{
+	"info": {
+		"_postman_id": "4bd7be26-8be2-4be2-a7d0-b5939a18b4c8",
+		"name": "ManageFilesApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24851696"
+	},
+	"item": [
+		{
+			"name": "Upload file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "Contenido de prueba"
+				},
+				"url": {
+					"raw": "{{baseURL}}/files/texto1.txt",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"files",
+						"texto1.txt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Download file",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/files/texto1.txt",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"files",
+						"texto1.txt"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

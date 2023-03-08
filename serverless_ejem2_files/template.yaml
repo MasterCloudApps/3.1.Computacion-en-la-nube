@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  serverless_ejem2_files
+
+  Sample SAM Template for serverless_ejem2_files
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 128
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageFilesApp
+      Handler: es.codeurjc.serverless.files.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
+      Events:
+        lambdaGetFile:
+          Type: Api
+          Properties:
+            Path: /files/{fileName}
+            Method: GET
+        lambdaWriteFile:
+          Type: Api
+          Properties:
+            Path: /files/{fileName}
+            Method: POST
+        lambdaUpdateFile:
+          Type: Api
+          Properties:
+            Path: /files/{fileName}
+            Method: PUT
+        lambdaDeleteFile:
+          Type: Api
+          Properties:
+            Path: /files/{fileName}
+            Method: DELETE
+      Policies:
+      -   Version: '2012-10-17'
+          Statement:
+            # Policy needed to use GetObject with right permissions (it needs to list the objects)
+            -   Sid: ListObjectsInBucket
+                Effect: Allow
+                Action:
+                  -   s3:ListBucket
+                Resource:
+                  -   arn:aws:s3:::spa-bucket-mca2021
+              # Policy needed to allow all operations in objects with right permissions
+            -   Sid: AllObjectActions
+                Effect: Allow
+                Action: s3:*Object
+                Resource:
+                  -   arn:aws:s3:::mca-serverless-bucket/*
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  PublicApi:
+    Description: "API Gateway endpoint URL for ManageFiles App"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
