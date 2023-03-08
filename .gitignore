@@ -5,3 +5,6 @@ target/
 .project
 node_modules/
 dependency-reduced-pom.xml
+/serverless_ejem3_db/.aws-sam/
+/serverless_ejem2_files/.aws-sam/
+/serverless_ejem1_rest/.aws-sam/
