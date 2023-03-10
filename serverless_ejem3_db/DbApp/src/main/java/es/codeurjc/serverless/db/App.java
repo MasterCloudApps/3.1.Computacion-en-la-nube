@@ -69,12 +69,12 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
 
             Map<String,Object> user = mapper.readValue(data, new TypeReference<HashMap<String, Object>>() {});
 
-            PutItemOutcome res = userRepository.addUser(
+            Item item = userRepository.addUser(
                     (String)user.get("name"),
                     (String)user.get("email"),
                     (Integer)user.get("age"));
 
-            String id = (String) res.getItem().get("userid");
+            String id = (String) item.get("userid");
 
             String responseBody = mapper.writeValueAsString(id);
 
