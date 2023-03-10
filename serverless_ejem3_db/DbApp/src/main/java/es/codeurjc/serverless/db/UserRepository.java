@@ -43,9 +43,6 @@ public class UserRepository {
 
     public ScanResult getAllUsers() {
 
-        System.out.println(dynamoDB.listTables());
-        System.out.println(table.getDescription());
-
         ScanRequest scanRequest = new ScanRequest()
                 .withTableName(TABLE_NAME);
 
